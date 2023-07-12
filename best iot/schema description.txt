@@ -1,0 +1,22 @@
+const TimesSchema = new mongoose.Schema({
+  stage1: {
+    type: Number,
+    required: true
+  },
+  stage2: {
+    type: Number,
+    required: true
+  },
+  stage3: {
+    type: Number,
+    required: true
+  },
+  stage4: {
+    type: Number,
+    required: true
+  }
+});
+
+const Times = mongoose.model('Times', TimesSchema);
+
+module.exports = Times;

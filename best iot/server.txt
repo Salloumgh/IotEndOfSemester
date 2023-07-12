@@ -1,0 +1,68 @@
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+app.use(express.json());
+
+
+mongoose.connect('mongodb://localhost/timesDB', { useNewUrlParser: true, useUnifiedTopology: true });
+
+
+const TimesSchema = new mongoose.Schema({
+  stage1: Number,
+  stage2: Number,
+  stage3: Number,
+  stage4: Number
+});
+
+const Times = mongoose.model('Times', TimesSchema);
+
+
+app.get('/api/getTimes', async (req, res) => {
+  try {
+    const times = await Times.findOne();
+    res.json(times);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+app.put('/api/updateTimes', async (req, res) => {
+  try {
+    await Times.findOneAndUpdate({}, req.body);
+    res.json({ message: 'Times updated successfully' });
+
+    
+    sendTimesToArduino(req.body);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
+function sendTimesToArduino(times) {
+  const url = "http://yourarduinoip/updateTimes";
+  const options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(times)
+  };
+
+  fetch(url, options)
+    .then(response => {
+      if (response.ok) {
+        console.log("Times sent to Arduino");
+      } else {
+        console.log("Failed to send times to Arduino");
+      }
+    })
+    .catch(error => {
+      console.log("Error sending times to Arduino:", error);
+    });
+}
+
+app.listen(3000, () => {
+  console.log('Server started on port 3000');
+});

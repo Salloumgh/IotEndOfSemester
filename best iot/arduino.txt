@@ -1,0 +1,66 @@
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <ESP8266HTTPClient.h>
+
+const char* ssid = "Salloum";
+const char* password = "010899";
+const String serverURL = "http:localhost:3000";
+
+void setup() {
+  Serial.begin(9600);
+  WiFi.begin(ssid, password);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+  }
+}
+
+void loop() {
+ 
+  HTTPClient http;
+  String url = serverURL + "/api/getTimes";
+  http.begin(url);
+  int httpCode = http.GET();
+
+  if (httpCode == HTTP_CODE_OK) {
+    String response = http.getString();
+    
+    DynamicJsonDocument doc(1024);
+    deserializeJson(doc, response);
+
+    int stage1Duration = doc["stage1"];
+    int stage2Duration = doc["stage2"];
+    int stage3Duration = doc["stage3"];
+    int stage4Duration = doc["stage4"];
+
+    executeStage1(stage1Duration);
+    executeStage2(stage2Duration);
+    executeStage3(stage3Duration);
+    executeStage4(stage4Duration);
+  }
+  
+  http.end();
+  delay(1000);
+}
+
+void executeStage1(int duration) {
+Serial.println("Starting heating...");
+ 
+  delay(duration * 1000); 
+}
+
+void executeStage2(int duration) {
+Serial.println("Starting heating...");
+  
+  delay(duration * 1000);  
+}
+
+void executeStage3(int duration) {
+Serial.println("Starting heating...");
+  
+  delay(duration * 1000); 
+}
+void executeStage4(int duration) {
+Serial.println("Starting heating...");
+ 
+  delay(duration * 1000); 
+}
